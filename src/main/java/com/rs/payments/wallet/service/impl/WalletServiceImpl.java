@@ -13,6 +13,7 @@ import com.rs.payments.wallet.service.WalletService;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -43,6 +44,7 @@ public class WalletServiceImpl implements WalletService {
         return user.getWallet();
     }
 
+    @Transactional
     @Override
     public Wallet deposit(UUID walletId, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
@@ -55,6 +57,7 @@ public class WalletServiceImpl implements WalletService {
         return walletRepository.save(wallet);
     }
 
+    @Transactional
     @Override
     public Wallet withdraw(UUID walletId, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -66,8 +69,8 @@ public class WalletServiceImpl implements WalletService {
             throw new RuntimeException("Insufficient balance");
         }
         wallet.setBalance(wallet.getBalance().subtract(amount));
-        walletRepository.save(wallet);
         recordTransaction(wallet,amount,TransactionType.WITHDRAWAL);
+        walletRepository.save(wallet);
         return wallet;
     }
 
