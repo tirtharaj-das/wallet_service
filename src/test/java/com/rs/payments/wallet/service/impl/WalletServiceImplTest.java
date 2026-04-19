@@ -1,8 +1,10 @@
 package com.rs.payments.wallet.service.impl;
 
 import com.rs.payments.wallet.exception.ResourceNotFoundException;
+import com.rs.payments.wallet.model.Transaction;
 import com.rs.payments.wallet.model.User;
 import com.rs.payments.wallet.model.Wallet;
+import com.rs.payments.wallet.repository.TransactionRepository;
 import com.rs.payments.wallet.repository.UserRepository;
 import com.rs.payments.wallet.repository.WalletRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,9 @@ class WalletServiceImplTest {
 
     @Mock
     private WalletRepository walletRepository;
+
+    @Mock
+    private TransactionRepository transactionRepository;
 
     @InjectMocks
     private WalletServiceImpl walletService;
@@ -93,6 +98,7 @@ class WalletServiceImplTest {
 
         verify(walletRepository, times(1)).findById(walletId);
         verify(walletRepository, times(1)).save(wallet);
+        verify(transactionRepository, times(1)).save(any(Transaction.class));
     }
 
     @Test
