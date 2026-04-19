@@ -186,4 +186,27 @@ class WalletServiceImplTest {
         verify(walletRepository, times(2)).save(any(Wallet.class));
         verify(transactionRepository, times(2)).save(any(Transaction.class));
     }
+
+    @Test
+    @DisplayName("Should throw exception when insufficient balance during transfer")
+    void shouldFailTransferWhenInsufficientBalance() {
+        UUID fromId = UUID.randomUUID();
+        UUID toId = UUID.randomUUID();
+
+        Wallet fromWallet = new Wallet();
+        fromWallet.setId(fromId);
+        fromWallet.setBalance(new BigDecimal("20"));
+
+        Wallet toWallet = new Wallet();
+        toWallet.setId(toId);
+        toWallet.setBalance(new BigDecimal("50"));
+
+        when(walletRepository.findById(fromId)).thenReturn(Optional.of(fromWallet));
+        when(walletRepository.findById(toId)).thenReturn(Optional.of(toWallet));
+
+        BigDecimal amount = new BigDecimal("100");
+
+        assertThrows(RuntimeException.class,
+                () -> walletService.transfer(fromId, toId, amount));
+    }
 }
