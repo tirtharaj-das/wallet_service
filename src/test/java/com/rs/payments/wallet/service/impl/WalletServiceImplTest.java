@@ -115,4 +115,29 @@ class WalletServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> walletService.deposit(walletId, BigDecimal.TEN));
         verify(walletRepository, times(1)).findById(walletId);
     }
+
+    @Test
+    @DisplayName("Should withdraw amount successfully")
+    void shouldWithdrawAmountSuccessfully() {
+        // Given
+        UUID walletId = UUID.randomUUID();
+
+        Wallet wallet = new Wallet();
+        wallet.setId(walletId);
+        wallet.setBalance(new BigDecimal("100"));
+
+        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+        when(walletRepository.save(any(Wallet.class))).thenAnswer(i -> i.getArgument(0));
+
+        BigDecimal withdrawAmount = new BigDecimal("40");
+
+        // When
+        Wallet result = walletService.withdraw(walletId, withdrawAmount);
+
+        // Then
+        assertEquals(new BigDecimal("60"), result.getBalance());
+
+        verify(walletRepository).save(wallet);
+        verify(transactionRepository).save(any(Transaction.class));
+    }
 }
