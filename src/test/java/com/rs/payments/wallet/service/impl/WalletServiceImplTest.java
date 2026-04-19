@@ -157,4 +157,33 @@ class WalletServiceImplTest {
         assertThrows(RuntimeException.class,
                 () -> walletService.withdraw(walletId, withdrawAmount));
     }
+
+    @Test
+    @DisplayName("Should transfer amount successfully")
+    void shouldTransferAmountSuccessfully() {
+        UUID fromId = UUID.randomUUID();
+        UUID toId = UUID.randomUUID();
+
+        Wallet fromWallet = new Wallet();
+        fromWallet.setId(fromId);
+        fromWallet.setBalance(new BigDecimal("100"));
+
+        Wallet toWallet = new Wallet();
+        toWallet.setId(toId);
+        toWallet.setBalance(new BigDecimal("50"));
+
+        when(walletRepository.findById(fromId)).thenReturn(Optional.of(fromWallet));
+        when(walletRepository.findById(toId)).thenReturn(Optional.of(toWallet));
+        when(walletRepository.save(any(Wallet.class))).thenAnswer(i -> i.getArgument(0));
+
+        BigDecimal amount = new BigDecimal("30");
+
+        Wallet result = walletService.transfer(fromId, toId, amount);
+
+        assertEquals(new BigDecimal("70"), fromWallet.getBalance());
+        assertEquals(new BigDecimal("80"), toWallet.getBalance());
+
+        verify(walletRepository, times(2)).save(any(Wallet.class));
+        verify(transactionRepository, times(2)).save(any(Transaction.class));
+    }
 }
