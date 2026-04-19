@@ -1,5 +1,6 @@
 package com.rs.payments.wallet.service.impl;
 
+import com.rs.payments.wallet.exception.InsufficientBalanceException;
 import com.rs.payments.wallet.exception.ResourceNotFoundException;
 import com.rs.payments.wallet.model.Transaction;
 import com.rs.payments.wallet.model.User;
@@ -154,7 +155,7 @@ class WalletServiceImplTest {
 
         BigDecimal withdrawAmount = new BigDecimal("100");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(InsufficientBalanceException.class,
                 () -> walletService.withdraw(walletId, withdrawAmount));
     }
 
@@ -206,7 +207,7 @@ class WalletServiceImplTest {
 
         BigDecimal amount = new BigDecimal("100");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(InsufficientBalanceException.class,
                 () -> walletService.transfer(fromId, toId, amount));
     }
 }
