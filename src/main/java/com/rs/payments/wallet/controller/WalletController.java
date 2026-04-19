@@ -46,4 +46,100 @@ public class WalletController {
         Wallet wallet = walletService.createWalletForUser(request.getUserId());
         return ResponseEntity.ok(wallet);
     }
+
+    @Operation(
+            summary = "Deposit amount into wallet",
+            description = "Deposits the specified amount into the given wallet ID.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Deposit successful",
+                            content = @Content(schema = @Schema(implementation = Wallet.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Wallet not found"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid amount"
+                    )
+            }
+    )
+    @PostMapping("/{walletId}/deposit")
+    public ResponseEntity<Wallet> deposit(
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.PathVariable java.util.UUID walletId,
+
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.RequestParam java.math.BigDecimal amount
+    ) {
+        Wallet wallet = walletService.deposit(walletId, amount);
+        return ResponseEntity.ok(wallet);
+    }
+
+    @Operation(
+            summary = "Withdraw amount from wallet",
+            description = "Withdraws the specified amount from the given wallet ID.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Withdrawal successful",
+                            content = @Content(schema = @Schema(implementation = Wallet.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Wallet not found"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid amount or insufficient balance"
+                    )
+            }
+    )
+    @PostMapping("/{walletId}/withdraw")
+    public ResponseEntity<Wallet> withdraw(
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.PathVariable java.util.UUID walletId,
+
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.RequestParam java.math.BigDecimal amount
+    ) {
+        Wallet wallet = walletService.withdraw(walletId, amount);
+        return ResponseEntity.ok(wallet);
+    }
+
+    @Operation(
+            summary = "Transfer amount between wallets",
+            description = "Transfers amount from one wallet to another.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Transfer successful",
+                            content = @Content(schema = @Schema(implementation = Wallet.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Wallet not found"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid amount or insufficient balance"
+                    )
+            }
+    )
+    @PostMapping("/transfer")
+    public ResponseEntity<Wallet> transfer(
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.RequestParam java.util.UUID fromWalletId,
+
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.RequestParam java.util.UUID toWalletId,
+
+            @jakarta.validation.constraints.NotNull
+            @org.springframework.web.bind.annotation.RequestParam java.math.BigDecimal amount
+    ) {
+        Wallet wallet = walletService.transfer(fromWalletId, toWalletId, amount);
+        return ResponseEntity.ok(wallet);
+    }
 }
