@@ -139,6 +139,7 @@ class WalletServiceImplTest {
 
         verify(walletRepository).save(wallet);
         verify(transactionRepository).save(any(Transaction.class));
+        verify(transactionRepository).save(any(Transaction.class));
     }
 
     @Test

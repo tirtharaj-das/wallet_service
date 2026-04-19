@@ -51,13 +51,7 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
         wallet.setBalance(wallet.getBalance().add(amount));
-        Transaction transaction = new Transaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setType(TransactionType.DEPOSIT);
-        transaction.setTimestamp(LocalDateTime.now());
-        transaction.setDescription("Deposit");
-        transactionRepository.save(transaction);
+        recordTransaction(wallet,amount,TransactionType.DEPOSIT);
         return walletRepository.save(wallet);
     }
 
@@ -73,13 +67,15 @@ public class WalletServiceImpl implements WalletService {
         }
         wallet.setBalance(wallet.getBalance().subtract(amount));
         walletRepository.save(wallet);
-        Transaction transaction = new Transaction();
-        transaction.setWallet(wallet);
-        transaction.setAmount(amount);
-        transaction.setType(TransactionType.WITHDRAWAL);
-        transaction.setTimestamp(LocalDateTime.now());
-        transaction.setDescription("Withdrawal");
-        transactionRepository.save(transaction);
+        recordTransaction(wallet,amount,TransactionType.WITHDRAWAL);
         return wallet;
+    }
+
+    private void recordTransaction(Wallet wallet, BigDecimal amount, TransactionType type) {
+        Transaction txn = new Transaction();
+        txn.setWallet(wallet);
+        txn.setAmount(amount);
+        txn.setType(type);
+        transactionRepository.save(txn);
     }
 }
