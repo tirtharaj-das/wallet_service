@@ -140,4 +140,21 @@ class WalletServiceImplTest {
         verify(walletRepository).save(wallet);
         verify(transactionRepository).save(any(Transaction.class));
     }
+
+    @Test
+    @DisplayName("Should throw exception when insufficient balance")
+    void shouldThrowExceptionWhenInsufficientBalance() {
+        UUID walletId = UUID.randomUUID();
+
+        Wallet wallet = new Wallet();
+        wallet.setId(walletId);
+        wallet.setBalance(new BigDecimal("50"));
+
+        when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
+
+        BigDecimal withdrawAmount = new BigDecimal("100");
+
+        assertThrows(RuntimeException.class,
+                () -> walletService.withdraw(walletId, withdrawAmount));
+    }
 }
