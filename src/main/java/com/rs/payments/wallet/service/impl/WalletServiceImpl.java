@@ -48,9 +48,9 @@ public class WalletServiceImpl implements WalletService {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
-        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
         wallet.setBalance(wallet.getBalance().add(amount));
-
         Transaction transaction = new Transaction();
         transaction.setWallet(wallet);
         transaction.setAmount(amount);

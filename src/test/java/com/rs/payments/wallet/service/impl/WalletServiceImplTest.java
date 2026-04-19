@@ -79,14 +79,11 @@ class WalletServiceImplTest {
     void shouldDepositAmountSuccessfully() {
         // Given
         UUID walletId = UUID.randomUUID();
-
         Wallet wallet = new Wallet();
         wallet.setId(walletId);
         wallet.setBalance(new BigDecimal("100"));
-
         when(walletRepository.findById(walletId)).thenReturn(Optional.of(wallet));
         when(walletRepository.save(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
         BigDecimal depositAmount = new BigDecimal("50");
 
         // When
@@ -105,12 +102,8 @@ class WalletServiceImplTest {
     @DisplayName("Should throw exception for negative amount")
     void shouldThrowExceptionForNegativeAmount() {
         UUID walletId = UUID.randomUUID();
-
         BigDecimal amount = new BigDecimal("-10");
-
-        assertThrows(IllegalArgumentException.class,
-                () -> walletService.deposit(walletId, amount));
-
+        assertThrows(IllegalArgumentException.class, () -> walletService.deposit(walletId, amount));
         verify(walletRepository, never()).findById(any());
     }
 
@@ -118,12 +111,8 @@ class WalletServiceImplTest {
     @DisplayName("Should throw exception when wallet not found")
     void shouldThrowExceptionWhenWalletNotFound() {
         UUID walletId = UUID.randomUUID();
-
         when(walletRepository.findById(walletId)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> walletService.deposit(walletId, BigDecimal.TEN));
-
+        assertThrows(ResourceNotFoundException.class, () -> walletService.deposit(walletId, BigDecimal.TEN));
         verify(walletRepository, times(1)).findById(walletId);
     }
 }
