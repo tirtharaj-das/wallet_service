@@ -87,7 +87,7 @@ public class WalletServiceImpl implements WalletService {
     public Wallet transfer(UUID fromWalletId, UUID toWalletId, BigDecimal amount) {
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than zero");
+            throw new InvalidAmountException("Amount must be greater than zero");
         }
 
         Wallet fromWallet = walletRepository.findById(fromWalletId)
@@ -97,7 +97,7 @@ public class WalletServiceImpl implements WalletService {
                 .orElseThrow(() -> new ResourceNotFoundException("Destination wallet not found"));
 
         if (fromWallet.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
 
         // Deduct
