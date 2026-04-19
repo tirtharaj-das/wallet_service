@@ -1,5 +1,7 @@
 package com.rs.payments.wallet.service.impl;
 
+import com.rs.payments.wallet.exception.InsufficientBalanceException;
+import com.rs.payments.wallet.exception.InvalidAmountException;
 import com.rs.payments.wallet.exception.ResourceNotFoundException;
 import com.rs.payments.wallet.model.Transaction;
 import com.rs.payments.wallet.model.TransactionType;
@@ -47,9 +49,8 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     @Override
     public Wallet deposit(UUID walletId, BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
-            throw new IllegalArgumentException("Amount must be greater than zero");
-        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new InvalidAmountException("Amount must be greater than zero");
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
         wallet.setBalance(wallet.getBalance().add(amount));
@@ -60,13 +61,12 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     @Override
     public Wallet withdraw(UUID walletId, BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than zero");
-        }
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0)
+            throw new InvalidAmountException("Amount must be greater than zero");
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
         if (wallet.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
         wallet.setBalance(wallet.getBalance().subtract(amount));
         recordTransaction(wallet,amount,TransactionType.WITHDRAWAL);
